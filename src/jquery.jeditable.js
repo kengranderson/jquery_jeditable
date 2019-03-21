@@ -112,6 +112,11 @@
         var onerror  = settings.onerror  || reset;
         var before   = settings.before || false;
 
+        /* New properties to support custom containers (Ken Granderson) */
+        // Container selector is used to enable the destroy method to locate custom containers.
+        var containerSelector = settings.containerSelector || 'form';
+        // Container Factory enables the creation of custom containers using any tag / attributes.
+        var containerFactory = settings.containerFactory || function () { return '<form />'; };
         // TOOLTIP
         if (settings.tooltip) {
             $(this).attr('title', settings.tooltip);
@@ -131,7 +136,7 @@
             }
 
             if ('destroy' === target) {
-                destroy.apply($(this).find('form'), [settings, self]);
+                destroy.apply($(this).find(containerSelector), [settings, self]);
                 return;
             }
 
@@ -184,8 +189,9 @@
                 self.revert     = $(self).text();
                 $(self).html('');
 
-                /* Create the form object. */
-                var form = $('<form />');
+                /* Create the container object. */
+                var container = containerFactory();
+                var form = $(container);
 
                 /* Apply css or style or both. */
                 if (settings.cssclass) {
